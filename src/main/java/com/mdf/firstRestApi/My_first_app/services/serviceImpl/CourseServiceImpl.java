@@ -59,7 +59,7 @@ public class CourseServiceImpl implements ICourseService {
 	}
 
 	@Override
-	public Course updateCourse(Course course, long id) {
+	public List<Course> updateCourse(Course course, long id) {
 		// TODO Auto-generated method stub
 		Course findCourse = this.courseList
 						.stream()
@@ -75,7 +75,7 @@ public class CourseServiceImpl implements ICourseService {
 		
 		this.courseList.add(courseUpdated);
 		
-		return courseUpdated;
+		return this.getAllCourses((int)courseUpdated.getId(), 20);
 	}
 
 	@Override
