@@ -9,7 +9,7 @@ public interface ICourseService {
 	Course saveCourse(Course course);
 	Course getCourse(String name);
 	List<Course> getAllCourses(int from, int limit);
-	Course updateCourse(Course course);
+	Course updateCourse(Course course, long id);
 	Course deleteCourse(long id);
 
 }

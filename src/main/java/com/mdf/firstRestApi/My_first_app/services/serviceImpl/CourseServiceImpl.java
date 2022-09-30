@@ -1,6 +1,7 @@
 package com.mdf.firstRestApi.My_first_app.services.serviceImpl;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -19,9 +20,7 @@ public class CourseServiceImpl implements ICourseService {
     public Course saveCourse(Course course) {
         // TODO Auto-generated method stub
 
-        if (courseList.isEmpty()) {
-            course.setId(1);
-        } else {
+        if (!courseList.isEmpty()) {
             course.setId(courseList.get(courseList.size() - 1).getId() + 1);
         }
         
@@ -53,15 +52,30 @@ public class CourseServiceImpl implements ICourseService {
 	public List<Course> getAllCourses(int from, int limit) {
 		// TODO Auto-generated method stub
 		return this.courseList.stream()
+				.sorted(Comparator.comparingLong(Course::getId))
 				.skip(from)
-				.limit(limit)
+				.limit(limit)				
 				.toList();
 	}
 
 	@Override
-	public Course updateCourse(Course course) {
+	public Course updateCourse(Course course, long id) {
 		// TODO Auto-generated method stub
-		return null;
+		Course findCourse = this.courseList
+						.stream()
+						.filter(_course -> _course.getId() == id)
+						.findFirst()
+						.orElseThrow(()-> new CourseApiException(HttpStatus.BAD_REQUEST, "The course with ID" + id + "does not exist"));
+		
+		this.courseList.remove(findCourse);
+		
+		Course courseUpdated = new Course(course.getName(), course.getAuthor());
+		
+		courseUpdated.setId(findCourse.getId());
+		
+		this.courseList.add(courseUpdated);
+		
+		return courseUpdated;
 	}
 
 	@Override
