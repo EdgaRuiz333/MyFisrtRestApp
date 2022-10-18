@@ -5,10 +5,12 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import com.mdf.firstRestApi.My_first_app.exception.CourseApiException;
 import com.mdf.firstRestApi.My_first_app.models.Course;
+import com.mdf.firstRestApi.My_first_app.payloads.ApiResponse;
 import com.mdf.firstRestApi.My_first_app.services.ICourseService;
 
 @Component
@@ -17,7 +19,7 @@ public class CourseServiceImpl implements ICourseService {
 	private List<Course> courseList = new ArrayList<>();
 
 	@Override
-    public Course saveCourse(Course course) {
+    public ResponseEntity<ApiResponse> saveCourse(Course course) {
         // TODO Auto-generated method stub
 
         if (!courseList.isEmpty()) {
@@ -32,7 +34,7 @@ public class CourseServiceImpl implements ICourseService {
         }
         
         this.courseList.add(course);
-        return course;
+        return new ResponseEntity<ApiResponse>(new ApiResponse(true, "The course was created correctly"), HttpStatus.CREATED);
     }
 
 	@Override
@@ -59,7 +61,7 @@ public class CourseServiceImpl implements ICourseService {
 	}
 
 	@Override
-	public List<Course> updateCourse(Course course, long id) {
+	public ResponseEntity<ApiResponse> updateCourse(Course course, long id) {
 		// TODO Auto-generated method stub
 		Course findCourse = this.courseList
 						.stream()
@@ -75,13 +77,23 @@ public class CourseServiceImpl implements ICourseService {
 		
 		this.courseList.add(courseUpdated);
 		
-		return this.getAllCourses((int)courseUpdated.getId(), 20);
+		//return this.getAllCourses((int)courseUpdated.getId(), 20);
+		return new ResponseEntity<ApiResponse>(new ApiResponse(true, "The course was updated correctly"), HttpStatus.OK);
 	}
 
 	@Override
-	public Course deleteCourse(long id) {
+	public ResponseEntity<ApiResponse> deleteCourse(long id) {
 		// TODO Auto-generated method stub
-		return null;
+		
+		Course deleteCourse = this.courseList
+				.stream()
+				.filter(_course -> _course.getId() == id)
+				.findFirst()
+				.orElseThrow(()-> new CourseApiException(HttpStatus.BAD_REQUEST, "The course with ID" + id + "does not exist"));
+
+		this.courseList.remove(deleteCourse);
+		
+		return new ResponseEntity<ApiResponse>(new ApiResponse(true, "The course was deleted correctly"), HttpStatus.OK);
 	}
 
 }
